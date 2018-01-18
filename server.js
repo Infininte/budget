@@ -24,7 +24,7 @@ db.once('open', function() {
 app.set('port', process.env.PORT || 8001);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'src')));
+app.use(express.static(path.join(__dirname, 'dist')));
 
 
 app.get('/rest/page/*', (req, res) => {
@@ -53,6 +53,6 @@ app.listen(app.get('port'), () => {
   console.log('  Press CTRL-C to stop\n');
 });
 
-fileProcessor.processData();
+// fileProcessor.processData();
 
 module.exports = app;
