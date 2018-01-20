@@ -1,9 +1,14 @@
 import React from 'react';
 
-export default class Item extends React.Component {
-    render() {
-      return (
-        <title>ITEM ITEM ITEM!!</title>
-      );
-    }
+//expects an array called row
+const Item = (props) => {
+    return (
+      <tr>
+        {props.row.map(val => (
+          <td>{val}</td>
+        ))}
+      </tr>
+    );
   }
+
+  export default Item;

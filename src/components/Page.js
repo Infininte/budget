@@ -1,13 +1,26 @@
 import React from 'react';
+import Scrap from './Scrap';
 
 export default class Page extends React.Component {
-    render() {
-      return (
-        <h1>Start doing things</h1>
-        // <span className="flag">
-        //   <img className="icon" title={name} src={`/img/${icon}`}/>
-        //   {this.props.showName && <span className="name"> {name}</span>}
-        // </span>
-      );
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: "Test Page",
+      scraps: {
+        location: {
+          x: 50,
+          y: 50
+        }
+      }
     }
   }
+
+  render() {
+    return (
+      <div>
+        <h2>{this.state.title}</h2>
+        <Scrap />
+      </div>
+    );
+  }
+}
