@@ -1,5 +1,5 @@
 import React from 'react';
-import Scrap from './Scrap';
+import Scrap from './Scrap.jsx';
 
 export default class Page extends React.Component {
   constructor(props) {

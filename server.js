@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 
 PageSchema = require('./model/Page');
+ScrapSchema = require('./model/Scrap');
 const fileProcessor = require('./processor');
 
 /**
@@ -18,6 +19,27 @@ db.once('open', function() {
   console.log("We're connected!");
 });
 
+// var scrap = new ScrapSchema({
+//     name: "Food",
+//     x_loc: 50,
+//     y_loc: 50,
+//     items: [{
+//         name: "Wine",
+//         amount: "525",
+//         index: 0,
+//         tags: []
+//     }, {
+//         name: "Groceries",
+//         amount: "73",
+//         index: 1,
+//         tags: []
+//     }]
+// })
+// scrap.save((err, scrap) => {
+//     if(err) return console.error(err);
+//     console.log("Save schema!: " + scrap);
+// })
+
 /**
  * Express configuration.
  */
@@ -29,6 +51,13 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 app.get('/rest/page/*', (req, res) => {
   PageSchema.findOne({}, function(err, obj){
+      if(err) res.send("Could not find a page");
+      res.send(obj)
+  })
+});
+
+app.get('/rest/scrap/:scrapName', (req, res) => {
+    ScrapSchema.findOne({name: req.params.scrapName}, function(err, obj){
       if(err) res.send("Could not find a page");
       res.send(obj)
   })
@@ -49,7 +78,7 @@ app.post('/rest/page/*', (req, res) => {
 });
 
 app.listen(app.get('port'), () => {
-  console.log('%s App is running at http://localhost:%d in %s mode', '✓', app.get('port'), app.get('env')); 
+  console.log('%s App is running at http://localhost:%d in %s mode', '✓', app.get('port'), app.get('env'));
   console.log('  Press CTRL-C to stop\n');
 });
 

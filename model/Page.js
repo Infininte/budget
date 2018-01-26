@@ -1,24 +1,12 @@
 const mongoose = require('mongoose');
+const Scrap = require('./Scrap');
 
 var Schema = mongoose.Schema;
 
 //TODO break these into seperate Schemas
 PageSchema = new Schema({
     name: String,
-    scraps: [{
-            name: String,
-            x_loc: Number,
-            y_loc: Number,
-            items: [{
-                    name: String,
-                    amount: Number,
-                    index: Number,
-                    tags: [{
-                        type: String
-                    }]
-
-                }]
-        }]
+    scraps: [{ type: Schema.Types.ObjectId, ref: 'Scrap' }]
 });
 
 
