@@ -59,9 +59,31 @@ app.get('/rest/page/*', (req, res) => {
 app.get('/rest/scrap/:scrapName', (req, res) => {
     ScrapSchema.findOne({name: req.params.scrapName}, function(err, obj){
       if(err) res.send("Could not find a page");
-      res.send(obj)
+      res.send(obj) 
   })
 });
+
+app.post('/rest/scrap/:scrapName', (req, res) => {
+    try {
+        newScrap = new ScrapSchema(req.body);
+        newScrap.save();
+        res.send(newScrap);
+    } catch(error){
+        console.log(error);
+    }
+})
+
+app.put('/rest/scrap/:scrapName', (req, res) => {
+    console.log(req.body);
+    try {
+        ScrapSchema.findOneAndUpdate({name: req.params.scrapName}, req.body, {new: true, upsert: true}, function(err, obj){
+            if(err) res.send("Could not find a page");
+            res.send(obj) 
+        })
+    } catch(error){
+        console.log(error);
+    }
+})
 
 app.post('/rest/page/*', (req, res) => {
     let page = req.body;

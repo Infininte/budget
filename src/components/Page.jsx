@@ -6,12 +6,7 @@ export default class Page extends React.Component {
     super(props);
     this.state = {
       title: "Test Page",
-      scraps: {
-        location: {
-          x: 50,
-          y: 50
-        }
-      }
+      scraps: ["Food", "Fun"]
     }
   }
 
@@ -19,7 +14,9 @@ export default class Page extends React.Component {
     return (
       <div>
         <h2>{this.state.title}</h2>
-        <Scrap />
+        {this.state.scraps.map(name => 
+          <Scrap key={name} name={name} />
+        )}
       </div>
     );
   }
