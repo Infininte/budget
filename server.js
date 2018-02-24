@@ -7,6 +7,7 @@ mongoose.Promise = require('bluebird');
 
 PageSchema = require('./model/Page');
 ScrapSchema = require('./model/Scrap');
+ItemSchema = require('./model/Item');
 const fileProcessor = require('./processor');
 
 /**
@@ -58,7 +59,7 @@ app.get('/rest/page/*', (req, res) => {
 
 app.get('/rest/scrap/:scrapName', (req, res) => {
     ScrapSchema.findOne({name: req.params.scrapName}, function(err, obj){
-      if(err) res.send("Could not find a page");
+      if(err) res.status(404).send("Error: Could not find a scrap to update");
       res.send(obj) 
   })
 });
@@ -77,12 +78,36 @@ app.put('/rest/scrap/:scrapName', (req, res) => {
     console.log(req.body);
     try {
         ScrapSchema.findOneAndUpdate({name: req.params.scrapName}, req.body, {new: true, upsert: true}, function(err, obj){
-            if(err) res.send("Could not find a page");
+            if(err) {
+                res.status(404).send("Error: Could not find a scrap to update");
+                console.log(err);
+            }
             res.send(obj) 
         })
     } catch(error){
         console.log(error);
     }
+})
+
+app.post('/rest/scrap/:scrapName/item', (req, res) => {
+    ScrapSchema.findOne({name: req.params.scrapName}, function(err, scrap){
+        if (err) {
+            res.status(404).send("Error: Could not find a scrap to update");
+            return;
+        }
+
+        newItem = new ItemSchema(req.body);
+        scrap.items.push(newItem);
+        scrap.save();
+        res.send(scrap);
+    })
+    // try {
+    //     newScrap = new ItemSchema(req.body);
+    //     newScrap.save();
+    //     res.send(newScrap);
+    // } catch(error){
+    //     console.log(error);
+    // }
 })
 
 app.post('/rest/page/*', (req, res) => {

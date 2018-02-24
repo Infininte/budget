@@ -26,28 +26,61 @@ export default class Scrap extends React.Component {
       });
 
       this.updateScrap = this.updateScrap.bind(this);
+      this.updateItemOnScrap = this.updateItemOnScrap.bind(this);
+      this.addRow = this.addRow.bind(this);
+      this.getNextIndex = this.getNextIndex.bind(this);
   }
 
-  updateScrap(body) {
-    this.state.items[body.index] = body;
+  updateItemOnScrap(body) {
     console.log(this.state);
+    this.state.items[body.index] = body;
+    this.setState((prevState) => Object.assign(prevState, this.state));
+    this.updateScrap();
+  }
+
+  updateScrap() {
     fetch('http://localhost:8001/rest/scrap/' + this.props.name, 
         {
           method: 'PUT', 
           body: JSON.stringify(this.state), 
           headers: { 'Content-Type': 'application/json' }
         })
-      .then(res => res.json)
+      .then(res => res.json())
       .then(json => {
         console.log(json);
         this.setState((prevState) => Object.assign(prevState, json))
       })
   }
 
+  addRow() {
+    var emptyRow = Object.assign({}, this.state.items[0]);
+    Object.keys(emptyRow).forEach(key => emptyRow[key] = "");
+
+    emptyRow.index = this.getNextIndex();
+    delete emptyRow._id;
+    
+    fetch('http://localhost:8001/rest/scrap/' + this.props.name + "/item", 
+        {
+          method: 'POST', 
+          body: JSON.stringify(emptyRow), 
+          headers: { 'Content-Type': 'application/json' }
+        })
+      .then(res => res.json())
+      .then(json => {
+        console.log(json);
+        this.setState((prevState) => Object.assign(prevState, json))
+      })
+  }
+
+  getNextIndex() {
+    var indexes = this.state.items.map(row => row.index)
+    var maxIndex = Math.max(...indexes);
+    return maxIndex + 1;
+  }
 
   render() {
     return (
-      <div style={{position: 'absolute', top: this.state.x_loc + 'px', left: this.state.y_loc + 'px', padding: '10px'}}>
+      <div style={{position: 'absolute', top: this.state.y_loc + 'px', left: this.state.x_loc + 'px', padding: '10px'}}>
         <span style={{fontSize: '1.5em', fontWeight: 'bold'}}>{this.state.name}</span>
         <table style={tableStyle}>
           <thead>
@@ -62,11 +95,14 @@ export default class Scrap extends React.Component {
           <tbody>
             {
               this.state.items.map(rowObj => 
-                <Item key={rowObj.index} row={rowObj} updateScrap={this.updateScrap} />
+                <Item key={rowObj.index} row={rowObj} updateItemOnScrap={this.updateItemOnScrap} />
               )
             }
           </tbody>
         </table>
+        <div style={{textAlign: 'center', backgroundColor: 'rgb(186, 186, 186)', cursor: 'pointer'}} onClick={this.addRow}>
+          +
+        </div>
       </div>
     );
   }

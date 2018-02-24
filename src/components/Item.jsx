@@ -28,7 +28,7 @@ export default class Item extends React.Component {
   }
 
   onBlur(event) {
-    this.props.updateScrap(this.state.row);
+    this.props.updateItemOnScrap(this.state.row);
   }
 
   render() {
