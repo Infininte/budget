@@ -5,9 +5,9 @@ const app = express();
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 
-PageSchema = require('./model/Page');
-ScrapSchema = require('./model/Scrap');
-ItemSchema = require('./model/Item');
+var pages = require('./endpoints/pages');
+var scraps = require('./endpoints/scraps');
+
 const fileProcessor = require('./processor');
 
 /**
@@ -20,27 +20,6 @@ db.once('open', function() {
   console.log("We're connected!");
 });
 
-// var scrap = new ScrapSchema({
-//     name: "Food",
-//     x_loc: 50,
-//     y_loc: 50,
-//     items: [{
-//         name: "Wine",
-//         amount: "525",
-//         index: 0,
-//         tags: []
-//     }, {
-//         name: "Groceries",
-//         amount: "73",
-//         index: 1,
-//         tags: []
-//     }]
-// })
-// scrap.save((err, scrap) => {
-//     if(err) return console.error(err);
-//     console.log("Save schema!: " + scrap);
-// })
-
 /**
  * Express configuration.
  */
@@ -50,79 +29,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 
-app.get('/rest/page/*', (req, res) => {
-  PageSchema.findOne({}, function(err, obj){
-      if(err) res.send("Could not find a page");
-      res.send(obj)
-  })
-});
+app.use('/rest/page', pages);
 
-app.get('/rest/scrap/:scrapName', (req, res) => {
-    ScrapSchema.findOne({name: req.params.scrapName}, function(err, obj){
-      if(err) res.status(404).send("Error: Could not find a scrap to update");
-      res.send(obj) 
-  })
-});
-
-app.post('/rest/scrap/:scrapName', (req, res) => {
-    try {
-        newScrap = new ScrapSchema(req.body);
-        newScrap.save();
-        res.send(newScrap);
-    } catch(error){
-        console.log(error);
-    }
-})
-
-app.put('/rest/scrap/:scrapName', (req, res) => {
-    console.log(req.body);
-    try {
-        ScrapSchema.findOneAndUpdate({name: req.params.scrapName}, req.body, {new: true, upsert: true}, function(err, obj){
-            if(err) {
-                res.status(404).send("Error: Could not find a scrap to update");
-                console.log(err);
-            }
-            res.send(obj) 
-        })
-    } catch(error){
-        console.log(error);
-    }
-})
-
-app.post('/rest/scrap/:scrapName/item', (req, res) => {
-    ScrapSchema.findOne({name: req.params.scrapName}, function(err, scrap){
-        if (err) {
-            res.status(404).send("Error: Could not find a scrap to update");
-            return;
-        }
-
-        newItem = new ItemSchema(req.body);
-        scrap.items.push(newItem);
-        scrap.save();
-        res.send(scrap);
-    })
-    // try {
-    //     newScrap = new ItemSchema(req.body);
-    //     newScrap.save();
-    //     res.send(newScrap);
-    // } catch(error){
-    //     console.log(error);
-    // }
-})
-
-app.post('/rest/page/*', (req, res) => {
-    let page = req.body;
-    PageSchema.findOne({name: page.name}, function(err, obj){
-        if(err || !obj){
-            newPage = new PageSchema(page);
-            newPage.save();
-            return;
-        }
-        Object.assign(obj, page)
-        obj.save();
-    })
-    res.sendStatus(200)
-});
+app.use('/rest/scrap', scraps);
 
 app.listen(app.get('port'), () => {
   console.log('%s App is running at http://localhost:%d in %s mode', '✓', app.get('port'), app.get('env'));

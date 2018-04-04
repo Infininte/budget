@@ -16,7 +16,8 @@ export default class Scrap extends React.Component {
     super(props)
 
     this.state = {
-      items: []
+      items: [],
+      columnMeta: []
     }
 
     fetch('http://localhost:8001/rest/scrap/' + this.props.name)
@@ -59,6 +60,7 @@ export default class Scrap extends React.Component {
     emptyRow.index = this.getNextIndex();
     delete emptyRow._id;
     
+    console.log(emptyRow)
     fetch('http://localhost:8001/rest/scrap/' + this.props.name + "/item", 
         {
           method: 'POST', 
@@ -73,7 +75,7 @@ export default class Scrap extends React.Component {
   }
 
   getNextIndex() {
-    var indexes = this.state.items.map(row => row.index)
+    var indexes = this.state.items.map(row => row.index).filter(val => val !== null && val !== undefined);
     var maxIndex = Math.max(...indexes);
     return maxIndex + 1;
   }
@@ -86,8 +88,10 @@ export default class Scrap extends React.Component {
           <thead>
             <tr>
               {
-                Object.keys(this.state.items[0] || {}).map(colTitle => 
-                  <th key={colTitle} style={thStyle}>{colTitle}</th>
+                this.state.columnMeta.sort((entryA, entryB) => 
+                    entryA.order - entryB.order
+                  ).map(colTitle => 
+                  <th key={colTitle.name} style={thStyle}>{colTitle.name}</th>
                 )
               }
             </tr>
@@ -95,7 +99,7 @@ export default class Scrap extends React.Component {
           <tbody>
             {
               this.state.items.map(rowObj => 
-                <Item key={rowObj.index} row={rowObj} updateItemOnScrap={this.updateItemOnScrap} />
+                <Item key={rowObj.index} row={rowObj} updateItemOnScrap={this.updateItemOnScrap} columnMeta={this.state.columnMeta}/>
               )
             }
           </tbody>

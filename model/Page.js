@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 //TODO break these into seperate Schemas
 PageSchema = new Schema({
     name: String,
-    scraps: [{ type: Schema.Types.ObjectId, ref: 'Scrap' }]
+    scraps: [String]
 });
 
 

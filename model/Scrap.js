@@ -7,6 +7,10 @@ ScrapSchema = new Schema({
     name: String,
     x_loc: Number,
     y_loc: Number,
+    columnMeta: [{
+            name: String,
+            order: Number
+        }],
     items: [{
             name: String,
             amount: Number,
@@ -18,6 +22,5 @@ ScrapSchema = new Schema({
         }]
     }
 );
-
 
 module.exports = mongoose.model('Scrap', ScrapSchema);
