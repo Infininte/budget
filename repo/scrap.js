@@ -1,5 +1,4 @@
 ScrapSchema = require('../model/Scrap');
-ItemSchema = require('../model/Item');
 
 let repo = {};
 

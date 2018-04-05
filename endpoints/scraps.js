@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 ScrapSchema = require('../model/Scrap');
-ItemSchema = require('../model/Item');
+CellSchema = require('../model/Cell');
 
 scrapRepo = require('../repo/scrap');
 
@@ -34,17 +34,17 @@ router.put('/:scrapName', (req, res) => {
     });
 })
 
-//Add an item
-router.post('/:scrapName/item', (req, res) => {
+//Add an cell
+router.post('/:scrapName/cell', (req, res) => {
     ScrapSchema.findOne({name: req.params.scrapName}, function(err, scrap){
         if (err) {
             res.status(404).send("Error: Could not find a scrap to update");
             return;
         }
 
-        newItem = new ItemSchema(req.body);
-        console.log(newItem);
-        scrap.items.push(newItem);
+        newCell = new CellSchema(req.body);
+        console.log(newCell);
+        scrap.items.push(newCell);
         scrap.save();
         res.send(scrap);
     })
