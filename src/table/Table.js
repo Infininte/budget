@@ -30,4 +30,16 @@ export default class Table {
     rows() {
         return Object.values(_.groupBy(this.list, this.yRetriever));
     }
+
+    addRow() {
+        var currentRows = this.rows();
+        var maxRow = currentRows.length - 1;
+        console.log("length: " + currentRows.length);
+        console.log(currentRows[maxRow]);
+        currentRows[maxRow]
+            .forEach(element => {
+                this.list.push(Object.assign({}, element, {y: maxRow + 1, value: ""}))
+            });
+        return this;
+    }
 };

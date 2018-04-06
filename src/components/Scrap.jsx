@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import Table from '../table/Table';
+import Cell from './Cell.jsx'
 // import Item from './Item.jsx';
 const fetch = require('node-fetch');
 
@@ -37,16 +38,17 @@ export default class Scrap extends React.Component {
 
 
       this.updateScrap = this.updateScrap.bind(this);
-      this.updateItemOnScrap = this.updateItemOnScrap.bind(this);
+      this.updateCellOnScrap = this.updateCellOnScrap.bind(this);
       this.addRow = this.addRow.bind(this);
       this.getNextIndex = this.getNextIndex.bind(this);
   }
 
-  updateItemOnScrap(body) {
-    console.log(this.state);
-    // this.state.items[body.index] = body;
-    // this.setState((prevState) => Object.assign(prevState, this.state));
-    // this.updateScrap();
+  updateCellOnScrap(cell) {
+    var index = this.state.cells.findIndex(c => c.y === cell.y && c.x === cell.x);
+    this.state.cells.splice(index, 1, cell);
+
+    this.setState((prevState) => Object.assign(prevState, this.state));
+    this.updateScrap();
   }
 
   updateScrap() {
@@ -58,30 +60,31 @@ export default class Scrap extends React.Component {
         })
       .then(res => res.json())
       .then(json => {
+        console.log("Updated scrap:");
         console.log(json);
         this.setState((prevState) => Object.assign(prevState, json))
       })
   }
 
-  addRow() {
-    // var emptyRow = Object.assign({}, this.state.items[0]);
-    // Object.keys(emptyRow).forEach(key => emptyRow[key] = "");
+  // updateCell(cell) {
+  //   fetch('http://localhost:8001/rest/scrap/' + this.props.name + "/y/" + cell.y + "/x/" + cell.x, 
+  //       {
+  //         method: 'PUT', 
+  //         body: JSON.stringify(cell), 
+  //         headers: { 'Content-Type': 'application/json' }
+  //       })
+  //     .then(res => res.json())
+  //     .then(json => {
+  //       console.log(json);
+  //       this.setState((prevState) => Object.assign(prevState, json))
+  //     })
+  // }
 
-    // emptyRow.index = this.getNextIndex();
-    // delete emptyRow._id;
-    
-    // console.log(emptyRow)
-    // fetch('http://localhost:8001/rest/scrap/' + this.props.name + "/item", 
-    //     {
-    //       method: 'POST', 
-    //       body: JSON.stringify(emptyRow), 
-    //       headers: { 'Content-Type': 'application/json' }
-    //     })
-    //   .then(res => res.json())
-    //   .then(json => {
-    //     console.log(json);
-    //     this.setState((prevState) => Object.assign(prevState, json))
-    //   })
+  addRow() {
+    this.state.cells = this.state.table.addRow().list;
+    console.log(this.state);
+    this.setState((prevState) => Object.assign(prevState, this.state));
+    this.updateScrap();
   }
 
   getNextIndex() {
@@ -99,13 +102,10 @@ export default class Scrap extends React.Component {
           </thead> */}
           <tbody>
             {
-              // this.state.items.map(rowObj => 
-              //   <Item key={rowObj.index} row={rowObj} updateItemOnScrap={this.updateItemOnScrap} columnMeta={this.state.columnMeta}/>
-              // )
               this.state.table.sorted().rows()
                 .map(rowArray => 
-                  <tr>
-                    {rowArray.map(cell => <td>{cell.value}</td>)}
+                  <tr key={rowArray[0].y}>
+                    {rowArray.map(cell => <td><Cell key={cell.y + ":" + cell.x} data={cell} update={this.updateCellOnScrap}></Cell></td>)}
                   </tr>
                 )
             }

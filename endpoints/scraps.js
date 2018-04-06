@@ -28,13 +28,15 @@ router.post('/:scrapName', (req, res) => {
 
 //Update a scrap
 router.put('/:scrapName', (req, res) => {
+    console.log("Trying to update scrap " + req.params.scrapName + "with body: ");
+    console.log(req.body);
     scrapRepo.updateScrap(req.params.scrapName, req.body, (err, obj) => {
         if(err) res.status(404).send("Error: Could not find a scrap to update");
         res.send(obj);
     });
 })
 
-//Add an cell
+//Add a cell
 router.post('/:scrapName/cell', (req, res) => {
     ScrapSchema.findOne({name: req.params.scrapName}, function(err, scrap){
         if (err) {
