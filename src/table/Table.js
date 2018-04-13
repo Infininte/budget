@@ -1,17 +1,24 @@
 import _ from 'lodash';
 
 export default class Table {
-    constructor(list, xRetriever, yRetriever){
+    constructor(list, yGet, xGet, ySet, xSet, clearValue){
         this.list = list;
-        this.xRetriever = xRetriever;
-        this.yRetriever = yRetriever;
+        this.yGet = yGet;
+        this.xGet = xGet;
+        this.ySet = ySet;
+        this.xSet = xSet;
+        this.clearValue = clearValue;
 
         this.rows = this.rows.bind(this);
+        this.columns = this.columns.bind(this);
+        this.dimmensionInSlices = this.dimmensionInSlices.bind(this);
+        this.addRow = this.addRow.bind(this);
+        this.addColumn = this.addColumn.bind(this);
         this.sorted = this.sorted.bind(this);
     }
 
-    sortByRetriever(valA, valB, retrieve){
-        return retrieve(valA) - retrieve(valB);
+    sortByGetter(valA, valB, getter){
+        return getter(valA) - getter(valB);
     }
 
     reverseSort(val){
@@ -20,7 +27,7 @@ export default class Table {
 
     sorted() {
         this.list = this.list.sort(
-            (cellA, cellB) => this.reverseSort(this.sortByRetriever(cellA, cellB, this.yRetriever)) || this.sortByRetriever(cellA, cellB, this.xRetriever)
+            (cellA, cellB) => this.reverseSort(this.sortByGetter(cellA, cellB, this.yGet)) || this.sortByGetter(cellA, cellB, this.xGet)
         );
         return this;
     }
@@ -28,17 +35,35 @@ export default class Table {
     //Returns a list of lists
     //  Each sublist is a list of cells that all have the same y value
     rows() {
-        return Object.values(_.groupBy(this.list, this.yRetriever));
+        return this.dimmensionInSlices(this.yGet);
+    }
+
+    columns() {
+        return this.dimmensionInSlices(this.xGet);
+    }
+
+    dimmensionInSlices(dimmensionGetter){
+        return Object.values(_.groupBy(this.list, dimmensionGetter))
     }
 
     addRow() {
-        var currentRows = this.rows();
-        var maxRow = currentRows.length - 1;
-        console.log("length: " + currentRows.length);
-        console.log(currentRows[maxRow]);
-        currentRows[maxRow]
+        return this.addToDimension(this.rows, this.ySet)
+    }
+
+    addColumn() {
+        return this.addToDimension(this.columns, this.xSet)
+    }
+
+    addToDimension(dimensionInSlicesGetter, setterForDimension) {
+        var currentDimension = dimensionInSlicesGetter();
+        var maxInDimension = currentDimension.length - 1;
+        
+        currentDimension[maxInDimension]
             .forEach(element => {
-                this.list.push(Object.assign({}, element, {y: maxRow + 1, value: ""}))
+                let newCell = Object.assign({}, element)
+                setterForDimension(newCell, maxInDimension + 1);
+                this.clearValue(newCell);
+                this.list.push(newCell);
             });
         return this;
     }

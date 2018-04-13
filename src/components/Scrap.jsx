@@ -27,7 +27,7 @@ export default class Scrap extends React.Component {
       .then(res => res.json())
       .then(json => {
         this.setState((prevState) => {
-          var tableState = {table: new Table(json.cells, (cell) => cell.x, (cell) => cell.y)};
+          var tableState = {table: new Table(json.cells, (cell) => cell.y, (cell) => cell.x, (cell, y) => cell.y = y, (cell, x) => cell.x = x, (cell) => cell.value = "")};
           var returnObj = Object.assign(prevState, tableState, json);
           console.log("Return obj:");
           console.log(returnObj);
@@ -40,7 +40,7 @@ export default class Scrap extends React.Component {
       this.updateScrap = this.updateScrap.bind(this);
       this.updateCellOnScrap = this.updateCellOnScrap.bind(this);
       this.addRow = this.addRow.bind(this);
-      this.getNextIndex = this.getNextIndex.bind(this);
+      this.addColumn = this.addColumn.bind(this);
   }
 
   updateCellOnScrap(cell) {
@@ -66,20 +66,6 @@ export default class Scrap extends React.Component {
       })
   }
 
-  // updateCell(cell) {
-  //   fetch('http://localhost:8001/rest/scrap/' + this.props.name + "/y/" + cell.y + "/x/" + cell.x, 
-  //       {
-  //         method: 'PUT', 
-  //         body: JSON.stringify(cell), 
-  //         headers: { 'Content-Type': 'application/json' }
-  //       })
-  //     .then(res => res.json())
-  //     .then(json => {
-  //       console.log(json);
-  //       this.setState((prevState) => Object.assign(prevState, json))
-  //     })
-  // }
-
   addRow() {
     this.state.cells = this.state.table.addRow().list;
     console.log(this.state);
@@ -87,10 +73,11 @@ export default class Scrap extends React.Component {
     this.updateScrap();
   }
 
-  getNextIndex() {
-    // var indexes = this.state.items.map(row => row.index).filter(val => val !== null && val !== undefined);
-    // var maxIndex = Math.max(...indexes);
-    // return maxIndex + 1;
+  addColumn() {
+    this.state.cells = this.state.table.addColumn().list;
+    console.log(this.state);
+    this.setState((prevState) => Object.assign(prevState, this.state));
+    this.updateScrap();
   }
 
   render() {
@@ -112,7 +99,10 @@ export default class Scrap extends React.Component {
           </tbody>
         </table>
         <div style={{textAlign: 'center', backgroundColor: 'rgb(186, 186, 186)', cursor: 'pointer'}} onClick={this.addRow}>
-          +
+          + row
+        </div>
+        <div style={{textAlign: 'center', backgroundColor: 'rgb(186, 186, 186)', cursor: 'pointer'}} onClick={this.addColumn}>
+          + column
         </div>
       </div>
     );
